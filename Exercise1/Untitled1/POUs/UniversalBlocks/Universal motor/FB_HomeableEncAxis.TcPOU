@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_HomeableEncAxis" Id="{47e1576d-a738-47ef-bdf3-20a64e9797eb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_HomeableEncAxis EXTENDS FB_HomeableAxis
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbEncWait : TON;
+	bEnableLatchC AT %Q*: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[	IF bFirstCycle THEN
+		piHomeSensor.Description := 'Encoder C track';
+	END_IF
+
+	SUPER^();
+
+]]></ST>
+    </Implementation>
+    <Method Name="StateHoming" Id="{30964498-4c80-41dd-942a-8170f783a822}">
+      <Declaration><![CDATA[METHOD PROTECTED StateHoming : BOOL // Unit is performing action 1
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT fbMcHome.Error THEN // no error behavior
+
+//Home
+	fbMcHome(		Execute 	:= TRUE,
+					Axis		:= AxisRef,
+					HomingMode	:= MC_DefaultHoming,
+					bCalibratioNCam		:= piHomeSensor.Value);
+	
+	bEnableLatchC := TRUE;
+	fbEncWait(IN := piHomeSensor.Value, PT:= T#1000MS);
+	bEnableLatchC R= fbEncWait.Q;
+	
+	IF fbMcHome.Done THEN
+		iStepGeneral := 50;
+		fbMcHome(	Execute 	:= FALSE,
+					Axis		:= AxisRef,
+					HomingMode	:= MC_DefaultHoming,
+					bCalibratioNCam		:= piHomeSensor.Value);
+		bEnableLatchC := FALSE;
+	END_IF
+
+ELSE // error behavior
+	fbMcHome(		Execute 	:= FALSE,
+					Axis		:= AxisRef,
+					HomingMode	:= MC_DefaultHoming,
+					bCalibratioNCam		:= piHomeSensor.Value);
+	
+	bEnableLatchC := FALSE;
+	bError		:= TRUE;
+	iErrorID 	:= fbMcHome.ErrorID;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_HomeableEncAxis">
+      <LineId Id="28" Count="1" />
+      <LineId Id="26" Count="1" />
+      <LineId Id="12" Count="1" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_HomeableEncAxis.StateHoming">
+      <LineId Id="6" Count="6" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="13" Count="5" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="19" Count="7" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="27" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

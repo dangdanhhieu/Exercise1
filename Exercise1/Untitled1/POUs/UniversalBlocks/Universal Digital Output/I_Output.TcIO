@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Itf Name="I_Output" Id="{95367fe2-4a14-4292-b97c-bf307777b759}">
+    <Declaration><![CDATA[INTERFACE I_Output
+]]></Declaration>
+    <Property Name="Description" Id="{faa10d64-082c-47e6-a485-78a2df818df2}">
+      <Declaration><![CDATA[PROPERTY Description : STRING]]></Declaration>
+      <Get Name="Get" Id="{e35f4b34-a5bb-4c4c-8e94-d411bf3dadca}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{b110e4be-05ef-4698-b324-48521c7d9f74}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ManualMode" Id="{cd4d63e8-cfa1-4fad-a70e-550e8be8e4e1}">
+      <Declaration><![CDATA[PROPERTY ManualMode : BOOL]]></Declaration>
+      <Get Name="Get" Id="{49f323b8-0a6b-4b6b-bfdf-85a028f1b17c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{49910b90-d0f0-4ad4-a488-ce4126bd6c48}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="OutAuto" Id="{d05a24c2-4693-4393-9688-82bef1c51ea4}">
+      <Declaration><![CDATA[PROPERTY OutAuto : BOOL]]></Declaration>
+      <Get Name="Get" Id="{7ce10b34-e5bb-4792-93af-cb38324f63df}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{d7131f0e-480e-44c2-ba88-90c488348d94}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="OutManual" Id="{d4185616-8eef-4a4b-b087-6ff63b76222a}">
+      <Declaration><![CDATA[PROPERTY OutManual : BOOL]]></Declaration>
+      <Get Name="Get" Id="{7207add6-b0a6-4283-9ff2-7f3ddb1206cc}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{e98bdc0c-144c-4f64-abcd-0b4528776950}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+  </Itf>
+</TcPlcObject>

@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Alarm" Id="{bed2f1ec-601f-4cc2-8a29-1b808b16b28e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Alarm
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	iAlarmNumber	:	UINT := 0;
+	bTemporary		:	BOOL;
+	bLatched		:	BOOL;
+	sDescription	:	STRING;
+	tsTimeOfOccur	:	TIMESTRUCT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="AlarmNumber" Id="{483a5e8f-e08f-4185-a7aa-e29351bf5027}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY AlarmNumber : UINT]]></Declaration>
+      <Get Name="Get" Id="{c4f26928-98dc-4c9d-9862-1e4d292467e1}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AlarmNumber := iAlarmNumber;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{34ff1225-6927-4657-9d54-c93ff4ec9022}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[iAlarmNumber := AlarmNumber;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Description" Id="{214ab764-e938-4b63-851b-2218f8564a19}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY Description : String]]></Declaration>
+      <Get Name="Get" Id="{e01f57f2-a097-4d10-85f5-7efcc6e1a96a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Description := sDescription;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{9d7a9df7-1269-4b94-bc23-d9a9287edc13}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[sDescription := Description;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Get" Id="{d062801b-a649-41fa-89db-fb1d0aae96e8}">
+      <Declaration><![CDATA[METHOD Get : BOOL
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Get := bLatched;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{de0d8ec5-fb9f-498f-bc79-30c4e4f55aa9}">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bTemporary THEN
+	IF bLatched = TRUE THEN
+		Reset := TRUE;
+		bLatched := FALSE;
+	END_IF
+ELSE
+	Reset := FALSE;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Set" Id="{b7405dae-7583-4782-9136-6c5894abd4ae}">
+      <Declaration><![CDATA[METHOD Set : BOOL
+VAR
+END_VAR
+VAR_INPUT
+	bIn	:	BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bTemporary := bIn;
+IF NOT bLatched AND bIn THEN
+	bLatched := TRUE;
+	tsTimeOfOccur := GVL.fbLocalTime.systemTime;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="TimeOfOccur" Id="{c3b469ec-af3f-4075-a3f3-f61a65b94a03}">
+      <Declaration><![CDATA[PROPERTY TimeOfOccur : TIMESTRUCT]]></Declaration>
+      <Get Name="Get" Id="{356b5a6f-631f-4527-b08a-81847e945bd1}">
+        <Declaration><![CDATA[
+VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TimeOfOccur := tsTimeOfOccur;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_Alarm">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.AlarmNumber.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.AlarmNumber.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.Description.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.Description.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.Get">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.Reset">
+      <LineId Id="3" Count="7" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.Set">
+      <LineId Id="3" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Alarm.TimeOfOccur.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

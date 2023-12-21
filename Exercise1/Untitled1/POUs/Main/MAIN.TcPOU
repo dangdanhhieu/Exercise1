@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{a5364a73-dda7-4b59-b949-53d76c31a94b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	fbMachine	: FB_Machine;
+	bTimeValid	: BOOL;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbMachine();
+CurrentTime();
+]]></ST>
+    </Implementation>
+    <Method Name="CurrentTime" Id="{2bfafcd3-c480-40dd-83bd-82b250af4621}">
+      <Declaration><![CDATA[METHOD CurrentTime : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GVL.fbLocalTime(bEnable := TRUE);
+
+IF GVL.fbLocalTime.bValid THEN
+	bTimeValid := TRUE;
+END_IF
+
+IF bTimeValid THEN
+	GVL.iYear 	:= WORD_TO_UINT(GVL.fbLocalTime.systemTime.wYear);
+	GVL.iMonth 	:= WORD_TO_UINT(GVL.fbLocalTime.systemTime.wMonth);
+	GVL.iDay 	:= WORD_TO_UINT(GVL.fbLocalTime.systemTime.wDay);
+	GVL.iHour 	:= WORD_TO_UINT(GVL.fbLocalTime.systemTime.wHour);
+	GVL.iMinute := WORD_TO_UINT(GVL.fbLocalTime.systemTime.wMinute);
+	GVL.iSecond := WORD_TO_UINT(GVL.fbLocalTime.systemTime.wSecond);
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="MAIN">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="MAIN.CurrentTime">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

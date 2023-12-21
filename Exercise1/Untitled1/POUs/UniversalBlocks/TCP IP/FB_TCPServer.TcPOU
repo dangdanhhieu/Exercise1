@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TCPServer" Id="{eaed78c2-34d1-42b7-98f4-b58fa196fe7c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TCPServer
+
+VAR
+	sLocalHost: T_IPv4Addr;
+	nLocalPort: UDINT := 9000;
+	//bStartCommunication : BOOL;
+	sNetId	:T_AmsNetId;
+	//bSent	: BOOL;
+
+	bConnected: BOOL;
+	sSendData: STRING(255);
+	bBusy: BOOL;	
+	bError: BOOL;
+	nErrorID: UDINT;
+	sDataRev: STRING(255);
+
+	//iState: INT;
+	hListener: T_HSOCKET;
+	hSocket: T_HSOCKET;
+	fbSocketAccept: FB_SocketAccept;
+	fbSocketListen: FB_SocketListen;
+	fbSocketReceive: FB_SocketReceive;
+	fbSocketClose: FB_SocketClose;
+	fbSocketCloseAll: FB_SocketCloseAll;
+	fbSocketSend: FB_SocketSend;
+	bAcceptExecute: BOOL;
+	sReadData: STRING(255);
+	ReceiveCounter: UDINT;
+	bSocketCloseError: BOOL;
+	nSocketCloseError: UDINT;
+	//bSendTrigger: BOOL;
+	//sData : STRING(255);
+	iStepGeneral	: INT := 0;
+	iStepStop		: INT := 0;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[StateMachine();
+IF bError THEN
+	iStepGeneral := 50;
+END_IF]]></ST>
+    </Implementation>
+    <Folder Name="Property" Id="{f144cff3-1a2d-40e7-a2ed-669d7ab1a02b}" />
+    <Folder Name="Request" Id="{54531ff0-b064-45c7-8196-eb2a931fdd5e}" />
+    <Folder Name="StateMachine" Id="{eebc7770-41d7-4656-97ea-5def8c1a255f}" />
+    <Method Name="Connect" Id="{f07c0af8-fe4f-482b-979b-a526c29434e2}" FolderPath="Request\">
+      <Declaration><![CDATA[METHOD Connect : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bConnected AND NOT bError THEN
+	iStepGeneral := 1;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="DataRev" Id="{a4e638e6-dfa1-4334-8209-4437e9039d14}" FolderPath="Property\">
+      <Declaration><![CDATA[PROPERTY DataRev : String(255)]]></Declaration>
+      <Get Name="Get" Id="{a35e3adc-26a1-472a-8847-1fa1686c7b20}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DataRev := sDataRev;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Disconnect" Id="{f3511e92-12fb-44f7-9c4d-2714d7fb6c9a}" FolderPath="Request\">
+      <Declaration><![CDATA[METHOD Disconnect : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[iStepGeneral := 50;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Error" Id="{7a447f67-3aea-4771-885d-4aa07b8a93fb}" FolderPath="Property\">
+      <Declaration><![CDATA[PROPERTY Error : bool]]></Declaration>
+      <Get Name="Get" Id="{c30990f4-29b5-47e2-a796-4aae3640f023}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error	:= bError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsConnect" Id="{90545187-2ecb-4d38-830c-212af879abe7}" FolderPath="Property\">
+      <Declaration><![CDATA[PROPERTY IsConnect : bool]]></Declaration>
+      <Get Name="Get" Id="{f4af79a5-76e2-41f6-ba73-704899e2c4a2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsConnect	:= bConnected;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="LocalHost" Id="{4b14a993-dad8-4a02-b6dc-e308d885d81e}" FolderPath="Property\">
+      <Declaration><![CDATA[PROPERTY LocalHost : T_IPv4Addr]]></Declaration>
+      <Set Name="Set" Id="{7db50b28-a2fe-4dcc-bb68-d0f22f7c4718}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[sLocalHost	:= LocalHost;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="LocalPort" Id="{ba9111b5-c1a2-44e4-9320-9537312776fc}" FolderPath="Property\">
+      <Declaration><![CDATA[PROPERTY LocalPort : UDINT]]></Declaration>
+      <Set Name="Set" Id="{b5c21f53-f9e8-4751-a7dd-97917c177d8d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[//nLocalPort	:= LocalPort;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="NetId" Id="{61d3a761-ba5b-48f1-99f1-825ea1c9a015}" FolderPath="Property\">
+      <Declaration><![CDATA[PROPERTY NetId : T_AmsNetId]]></Declaration>
+      <Set Name="Set" Id="{54e00d8b-840c-4594-8efb-094568e2f230}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[sNetId	:= NetId;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="SendData" Id="{b0a31b62-31ab-46c3-aa23-15c0d0113e3b}" FolderPath="Request\">
+      <Declaration><![CDATA[METHOD SendData : BOOL
+VAR_INPUT
+	DataSend	: STRING(255);
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[sSendData := DataSend;
+IF bConnected OR bError THEN
+	IF iStepGeneral = 30 THEN
+		iStepGeneral := 40;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateAccept" Id="{e54edb93-e854-4dd5-9adc-480d46711809}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD private StateAccept : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSocketAccept(																
+		sSrvNetId:= sNetId, 		
+		hListener:= hListener, 													
+		bExecute:= TRUE, 
+		tTimeout:= T#4S, 
+		bAccepted=> , 
+		bBusy=> bBusy, 
+		bError=> bError, 
+		nErrId=> nErrorID,
+		hSocket=> hSocket);														
+	IF NOT fbSocketAccept.bBusy THEN
+		fbSocketAccept(bExecute:= FALSE);
+	END_IF
+
+	IF bError THEN
+		iStepGeneral := 50; 
+	ELSIF hSocket.handle <> 0 THEN
+		iStepGeneral := iStepGeneral + 10; 
+		bConnected := TRUE;
+	END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateClose" Id="{2a5e788a-4a9d-4455-850d-8be8c7890e72}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateClose : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE iStepStop OF
+0:	// Error Handling	
+	fbSocketClose(																// Close Listener-Socket
+		sSrvNetId:= sNetId, 
+		hSocket:= hListener, 
+		bExecute:= TRUE, 
+		tTimeout:= T#4S, 
+		bBusy=> , 
+		bError=> bError, 
+		nErrId=> nErrorID);		
+	IF (NOT fbSocketClose.bBusy) OR fbSocketClose.bError THEN
+		hListener.handle := 0;
+		iStepStop := iStepStop + 1;
+	END_IF
+1:	
+	fbSocketClose(bExecute := FALSE);
+	iStepStop := iStepStop + 1;
+2:
+	fbSocketClose(																// Close Connection Socket
+		sSrvNetId:= sNetId, 
+		hSocket:= hSocket, 
+		bExecute:= TRUE, 
+		tTimeout:= T#4S, 
+		bBusy=> , 
+		bError=> bError, 
+		nErrId=> nErrorID);
+	IF NOT (fbSocketClose.bBusy) OR fbSocketClose.bError THEN
+		hSocket.handle 	:= 0;	
+		iStepGeneral 	:= 0;
+		iStepStop		:= 0;
+		bConnected 		:= FALSE;
+	END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateInit" Id="{c86ea60a-26db-47e4-b0e1-923e6e65d646}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateInit : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSocketCloseAll(
+		sSrvNetId:= sNetId, 
+		bExecute:= TRUE, 
+		tTimeout:= T#3S, 
+		bBusy=> , 
+		bError=> bSocketCloseError, 
+		nErrId=> nSocketCloseError);
+
+IF NOT (fbSocketCloseAll.bBusy OR fbSocketCloseAll.bError) THEN
+		fbSocketCloseAll(bExecute:= FALSE);
+		fbSocketListen(bExecute := FALSE);
+		fbSocketAccept(bExecute := FALSE);
+		fbSocketClose(bExecute:= FALSE);
+		bConnected	:= FALSE;
+		bBusy 		:= TRUE;
+		iStepGeneral := 10;
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateListen" Id="{87f37b74-b72a-4c99-85ba-a1d4657fa90b}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateListen : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSocketListen(																
+		sSrvNetId:= sNetId, 														
+		sLocalHost:= sLocalHost, 												
+		nLocalPort:= nLocalPort, 												
+		bExecute:= TRUE, 
+		tTimeout:= T#4S, 
+		bBusy=> bBusy, 
+		bError=> bError, 
+		nErrId=> nErrorID,
+		hListener=> hListener);													
+		
+	IF hListener.handle <> 0 THEN
+		iStepGeneral := iStepGeneral + 10;	
+	ELSIF bError THEN
+		iStepGeneral := 50;
+	END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateMachine" Id="{53701d1c-8d46-47b7-b412-3534c3493e1e}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateMachine : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE iStepGeneral OF
+	1:
+		StateInit();
+	10:
+		StateListen();
+	20:
+		StateAccept();
+	30:
+		StateReceive();
+	40:
+		StateSend();
+	50:
+		StateClose();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateReceive" Id="{d037dafd-38a5-406d-bbaf-d37dbd38c180}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateReceive : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSocketReceive(															
+		sSrvNetId:= sNetId, 
+		hSocket:= hSocket, 
+		cbLen:= SIZEOF(sReadData) , 
+		pDest:= ADR(sReadData), 
+		bExecute:= TRUE, 														
+		tTimeout:= T#4S, 
+		bBusy=> , 
+		bError=> bError, 
+		nErrId=> nErrorID,
+		nRecBytes=> );
+		
+	IF NOT fbSocketReceive.bBusy THEN
+		fbSocketReceive(bExecute := FALSE);
+		IF fbSocketReceive.nRecBytes <> 0 THEN									
+			sDataRev := sReadData;
+		END_IF
+	END_IF
+	
+	IF fbSocketReceive.bError OR(NOT bConnected) THEN					
+		iStepGeneral := 50;
+	END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateSend" Id="{0ec2b539-7683-4687-a5e4-0314df51f7b8}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateSend : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSocketSend(																// Send Data to client
+		sSrvNetId:= sNetId, 
+		hSocket:= hSocket, 
+		cbLen:= SIZEOF(sSendData), 
+		pSrc:= ADR(sSendData),
+		bExecute:= TRUE, 
+		tTimeout:= T#3S, 
+		bBusy=> , 
+		bError=> bError, 
+		nErrId=> nErrorID);	
+	
+	IF NOT fbSocketSend.bBusy THEN												// Switch back to receiving state after sending
+		iStepGeneral := iStepGeneral - 10;
+	ELSIF fbSocketSend.bError OR NOT bConnected THEN
+		iStepGeneral := 50;													// Close connection in case of error 
+	END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_TCPServer">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="37" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.Connect">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.DataRev.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.Disconnect">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.IsConnect.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.LocalHost.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.LocalPort.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.NetId.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.SendData">
+      <LineId Id="3" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.StateAccept">
+      <LineId Id="3" Count="18" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.StateClose">
+      <LineId Id="3" Count="31" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.StateInit">
+      <LineId Id="16" Count="5" />
+      <LineId Id="13" Count="1" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="31" Count="2" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.StateListen">
+      <LineId Id="3" Count="14" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.StateMachine">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.StateReceive">
+      <LineId Id="3" Count="20" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TCPServer.StateSend">
+      <LineId Id="3" Count="14" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

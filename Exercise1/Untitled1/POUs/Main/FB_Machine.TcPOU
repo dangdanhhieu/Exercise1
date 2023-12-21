@@ -1,0 +1,919 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Machine" Id="{117ca322-683b-4b48-8a20-4f1ff65989f6}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Machine
+VAR_INPUT
+	bManual	: FB_Input;
+	bAuto	: FB_Input;
+END_VAR
+VAR_OUTPUT
+	bError		: BOOL;
+	iErrorId	: INT;
+END_VAR
+
+VAR
+	iStepGeneral	: INT;
+	bISError		: BOOL;
+	bIsReady		: BOOL;
+	trig3s			: ton :=(pt:=T#3S);
+	trig1s			: ton :=(pt:=T#1S);
+	trig500ms		: ton :=(pt:=T#500MS);
+	trigCylin1		: ton;
+	tTimeCylin1		: TIME	:= T#0.5S;
+	trigCylin2		: ton;
+	tTimeCylin2		: TIME	:= T#2S;
+	bLightGreen		: FB_Output;
+	bLightYellow	: FB_Output;
+	bLightRed		: FB_Output;
+	bStart			: FB_Input;
+	bReset			: FB_Input;
+	bSensorCheck	: FB_Input;
+	bSensorOK		: FB_Input;
+	bSensorNG		: FB_Input;
+	bStop			: FB_Input;
+	bEStop			: FB_Input;
+	bStopTem		: BOOL;
+	bRunStep		: BOOL := FALSE;
+	bRun			: BOOL := FALSE;
+	trigStep		: r_trig;
+	trigSensorOK	: r_trig;
+	trigSensorNG	: r_trig;
+	iCounterOK		: INT;
+	iCounterNG		: INT;
+	bOnLightGreen	: BOOL;
+	bOnLightYellow	: BOOL;
+	bOnLightRed		: BOOL;
+	//Tcp-ip
+	trigTCp			: r_trig;
+	fbTcpServer		: FB_TCPServer;
+	sLocalHost		: T_IPv4Addr := '';
+	nLocalPort		: UDINT := 9000;
+	sNetId			: T_AmsNetId := '';  //'5.30.162.44.1.1';
+	sDataRev		: STRING(255);
+	sDataSend		: STRING(255);
+	bConnect		: BOOL;
+	bDisconnect		: BOOL;
+	bSend			: BOOL;
+	//servo
+	servo			: FB_Axis;
+	bMoveServo		: BOOL;
+	rDistance		: LREAL;
+	bStopServo		: BOOL;
+	//cylinder
+	cylinder1		: FB_CylinderDiag;
+	cylinder2		: FB_CylinderDiag;
+	cylinder3		: FB_CylinderDiag;
+	cylinder4		: FB_CylinderDiag;
+	//Alarm
+	servoAlarm		: FB_Alarm;
+	tcpServerAlarm	: Fb_Alarm;
+	cylinderAlarm	: FB_Alarm;
+	
+	bMoveWorkCylinder1	: BOOL;
+	bMoveBaseCylinder1	: BOOL;
+	bMoveWorkCylinder2	: BOOL;
+	bMoveBaseCylinder2	: BOOL;
+	bMoveWorkCylinder3	: BOOL;
+	bMoveBaseCylinder3	: BOOL;
+	bMoveWorkCylinder4	: BOOL;
+	bMoveBaseCylinder4	: BOOL;
+	
+	bManualHMI		: BOOL;
+	bAutoHMI		: BOOL;
+	bStartHMI		: BOOL;
+	bResetHMI		: bool;
+	bStopHMI		: bool;
+	bEStopHMI		: bool;
+	bSensorCheckHMI	: bool;
+	bSensorOKHMI	: bool;
+	bSensorNGHMI	: BOOL;
+	bSensorBase1HMI	: BOOL;
+	bSensorWork1HMI	: BOOL;
+	bSensorBase2HMI	: BOOL;
+	bSensorWork2HMI	: BOOL;
+	bSensorBase3HMI	: BOOL;
+	bSensorWork3HMI	: BOOL;
+	bSensorBase4HMI	: BOOL;
+	bSensorWork4HMI	: BOOL;
+	
+	iStepRun: INT := 0;
+	iStepAuto: INT := 0;
+	bCheck : BOOL;
+	bFirstCycle	: BOOL := TRUE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[StateMachine();
+AssignHMI();
+servo();
+fbTcpServer();
+//Menu mode
+IF bManual.Value OR bManualHMI THEN
+	iStepRun	:= 20;
+END_IF
+IF bAuto.Value OR bAutoHMI THEN
+	iStepRun	:= 10;
+END_IF
+//Reset
+IF bReset.Value OR bResetHMI THEN
+	iStepGeneral := 0;
+END_IF
+//Stop
+IF bStop.Value OR bStopHMI THEN
+	bStopTem := TRUE;
+END_IF
+IF bEStop.Value OR bEStopHMI THEN
+	iStepGeneral	:= 99;
+END_IF
+//Error
+bError := servoAlarm.Get() OR tcpServerAlarm.Get() OR cylinderAlarm.Get();
+]]></ST>
+    </Implementation>
+    <Folder Name="AssignHMI" Id="{6ab2d75c-58a6-4277-8f21-77c2a43228d1}" />
+    <Folder Name="StateMachine" Id="{9b32fb52-6cf5-4c1a-8cd9-a46f0506ca01}" />
+    <Folder Name="System" Id="{fd0d4d4c-611f-4932-a03e-c4c127d8480c}" />
+    <Method Name="AssignHMI" Id="{1d9fb41d-dac3-4c6d-8ec3-d664dd97af08}" FolderPath="AssignHMI\">
+      <Declaration><![CDATA[METHOD AssignHMI : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//Cylinder              
+//Input                 
+bMoveWorkCylinder1		:=	GVL_HMI.bMoveWorkCylinder1	;
+bMoveBaseCylinder1		:=	GVL_HMI.bMoveBaseCylinder1	;
+bMoveWorkCylinder2		:=	GVL_HMI.bMoveWorkCylinder2	;
+bMoveBaseCylinder2		:=	GVL_HMI.bMoveBaseCylinder2	;
+bMoveWorkCylinder3		:=	GVL_HMI.bMoveWorkCylinder3	;
+bMoveBaseCylinder3		:=	GVL_HMI.bMoveBaseCylinder3	;
+bMoveWorkCylinder4		:=	GVL_HMI.bMoveWorkCylinder4	;
+bMoveBaseCylinder4		:=	GVL_HMI.bMoveBaseCylinder4	;
+
+bSensorBase1HMI			:= GVL_HMI.bSensorBase1HMI;
+bSensorWork1HMI         := GVL_HMI.bSensorWork1HMI;
+bSensorBase2HMI         := GVL_HMI.bSensorBase2HMI;
+bSensorWork2HMI         := GVL_HMI.bSensorWork2HMI;
+bSensorBase3HMI         := GVL_HMI.bSensorBase3HMI;
+bSensorWork3HMI         := GVL_HMI.bSensorWork3HMI;
+bSensorBase4HMI         := GVL_HMI.bSensorBase4HMI;
+bSensorWork4HMI         := GVL_HMI.bSensorWork4HMI;
+//Cylinder                                          
+//Output                
+GVL_HMI.bAtBasePosCylinder1	:= cylinder1.bState_AtBasePos OR cylinder1.bState_MoveToBase;
+GVL_HMI.bAtWorkPosCylinder1	:= cylinder1.bState_AtWorkPos OR cylinder1.bState_MoveToWork;
+GVL_HMI.bAtBasePosCylinder2	:= cylinder2.bState_AtBasePos OR cylinder2.bState_MoveToBase;
+GVL_HMI.bAtWorkPosCylinder2	:= cylinder2.bState_AtWorkPos OR cylinder2.bState_MoveToWork;
+GVL_HMI.bAtBasePosCylinder3	:= cylinder3.bState_AtBasePos OR cylinder3.bState_MoveToBase;
+GVL_HMI.bAtWorkPosCylinder3	:= cylinder3.bState_AtWorkPos OR cylinder3.bState_MoveToWork;
+GVL_HMI.bAtBasePosCylinder4	:= cylinder4.bState_AtBasePos OR cylinder4.bState_MoveToBase;
+GVL_HMI.bAtWorkPosCylinder4	:= cylinder4.bState_AtWorkPos OR cylinder4.bState_MoveToWork;
+                        
+//Servo                 
+//Input                 
+bMoveServo	:=	GVL_HMI.bMoveServo	;		
+rDistance	:=	GVL_HMI.rDistance	;		
+bStopServo	:=	GVL_HMI.bStopServo	;		
+	                    
+//Servo                 
+//Output                
+GVL_HMI.rPosition	:= servo.ActualPosition;		
+GVL_HMI.rVelocity	:= servo.ActualVelocity;
+GVL_HMI.rEnable		:= servo.Enabled;	
+gvl_hmi.bErrorServo	:= servo.AnyError;
+//Tcp-ip server         
+//Input                 
+bConnect	:= GVL_HMI.bConnect		;	
+bDisconnect	:= GVL_HMI.bDisconnect	;		
+bSend		:= GVL_HMI.bSend		;		
+sDataSend	:= GVL_HMI.sDataSend	;
+fbTcpServer.LocalHost	:=GVL_HMI.sLocalHost;
+fbTcpServer.LocalPort	:=GVL_HMI.sLocalPort;		
+//Tcp-ip server         
+//Output                
+GVL_HMI.bIsConnect	:= fbTcpServer.IsConnect;		
+GVL_HMI.sDataRev	:= fbTcpServer.DataRev;
+GVL_HMI.bErrorTcp	:= fbTcpServer.Error;
+//System                
+//Input                 
+bRunStep			:= gvl_hmi.bRunStep;
+bRun	            := gvl_hmi.bRun;
+bManualHMI			:= GVL_HMI.bManual		;		
+bAutoHMI			:= GVL_HMI.bAuto		;		
+bStartHMI			:= GVL_HMI.bStart		;		
+bResetHMI			:= GVL_HMI.bReset		;		
+bStopHMI			:= GVL_HMI.bStopSystem	;		 	
+bEStopHMI			:= GVL_HMI.bEStopSystem	;		                 
+bSensorCheckHMI		:= GVL_HMI.bSensorCheck	;		
+bSensorOKHMI		:= GVL_HMI.bSensorOK	;		
+bSensorNGHMI		:= GVL_HMI.bSensorNG	;
+bOnLightGreen			:= gvl_hmi.bOnLightGreen;
+bOnLightYellow		:= gvl_hmi.bOnLightGreen;
+bOnLightRed		  	:= gvl_hmi.bOnLightGreen;
+		                
+//System                
+//Output
+
+gvl_hmi.bIsReady		:= bIsReady;               
+GVL_HMI.iCounterOK		:= iCounterOK;	
+GVL_HMI.iCounterNG		:= iCounterOK;		
+GVL_HMI.bErrorSystem	:= bError;
+
+GVL_HMI.bLightGreen		:= 	bLightGreen.OutAuto;
+GVL_HMI.bLightYellow    :=  bLightYellow.OutAuto;
+GVL_HMI.bLightRed	    :=  bLightRed.OutAuto;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateAuto" Id="{9f37bf81-6848-42a9-933d-0fd849f1ff20}" FolderPath="System\">
+      <Declaration><![CDATA[METHOD PRIVATE StateAuto : BOOL
+VAR
+
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+CASE iStepAuto OF
+	0: //run servo 10
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+	1:
+		IF NOT servo.AnyError AND servo.Enabled THEN
+			IF servo.ActualPosition <> 10 THEN
+				servo.MoveAbsolute(Position := 10);
+			END_IF
+		ELSE
+			iStepAuto := 99;
+		END_IF
+		IF servo.ActualPosition = 10 THEN
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+		END_IF
+
+	2: // run cylinder 1
+		IF bSensorCheck.Value OR bSensorCheckHMI THEN
+			bCheck := TRUE;
+		END_IF		
+		
+		IF bCheck THEN
+			IF NOT cylinder1.bError THEN
+				cylinder1.MoveToWork();
+			ELSE
+				iStepAuto	:= 99;
+			END_IF
+			trigCylin1(in:= cylinder1.bState_AtWorkPos OR bSensorWork1HMI,pt:=tTimeCylin1);
+			IF trigCylin1.Q THEN
+				cylinder1.MoveToBase();
+				bCheck	:= FALSE;
+			END_IF
+		END_IF
+			
+			
+		IF cylinder1.bState_AtBasePos OR bSensorBase1HMI AND( NOT bSensorCheck.Value OR NOT bSensorCheckHMI )THEN
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+		END_IF
+	3:// run servo 70
+		IF NOT servo.AnyError THEN
+			IF servo.ActualPosition <> 70 THEN
+				servo.MoveAbsolute(Position := 70);
+			END_IF			
+		ELSE
+			iStepAuto := 99;
+		END_IF
+		IF servo.ActualPosition = 70 THEN
+			bCheck	:= TRUE;
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+		END_IF
+		
+	4://run cylin 2
+		IF bCheck THEN
+			IF NOT cylinder2.bError THEN
+				cylinder2.MoveToWork();
+			ELSE
+				iStepAuto	:= 99;
+			END_IF
+			trigCylin2(in:= cylinder2.bState_AtWorkPos OR bSensorWork2HMI,pt:=tTimeCylin2);
+			IF trigCylin2.Q THEN
+				cylinder2.MoveToBase();
+				bCheck	:= FALSE;
+			END_IF
+		END_IF
+		IF NOT bCheck THEN
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+		END_IF
+
+	5://run servo 130
+		IF NOT servo.AnyError THEN
+			IF servo.ActualPosition <> 130 THEN
+				servo.MoveAbsolute(Position := 130);
+			END_IF
+		ELSE
+			iStepAuto := 99;
+		END_IF
+		
+		IF servo.ActualPosition = 130 THEN
+			bCheck	:= TRUE;
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+		END_IF
+	6:// trigger camera
+		IF bCheck THEN
+			IF fbTcpServer.IsConnect THEN
+				fbTcpServer.SendData(DataSend :='CHE,1');
+				bCheck := FALSE;
+			ELSE
+				iStepAuto := 99;
+			END_IF
+		END_IF
+	
+		IF NOT bCheck THEN
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+		END_IF
+	
+	7:// check camera
+		sDataRev := fbTcpServer.DataRev;
+		trigStep(clk:=bRun);
+		IF NOT bRunStep OR trigStep.Q THEN
+			IF sDataRev = 'CAM,1,OK' THEN
+					iStepAuto := iStepAuto + 1;
+			END_IF
+			IF sDataRev = 'CAM,1,NG' THEN
+					iStepAuto := iStepAuto + 2;
+			END_IF
+		END_IF
+		
+	8:// run servo 190
+		IF NOT servo.AnyError THEN
+			IF servo.ActualPosition <> 190 THEN
+				servo.MoveAbsolute(Position := 190);
+			END_IF
+		ELSE
+			iStepAuto := 99;
+		END_IF
+		
+		IF servo.ActualPosition = 190 THEN
+			bCheck	:= TRUE;
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 2;
+			END_IF
+		END_IF
+
+	9:// run servo 210
+		IF NOT servo.AnyError THEN
+			IF servo.ActualPosition <> 210 THEN
+				servo.MoveAbsolute(Position := 210);
+			END_IF
+		ELSE
+			iStepAuto := 99;
+		END_IF
+		IF servo.ActualPosition = 210 THEN
+			bCheck	:= TRUE;
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 2;
+			END_IF
+		END_IF
+	10://run cylin 3
+		IF bCheck THEN
+			IF NOT cylinder3.bError THEN
+				cylinder3.MoveToWork();
+				IF cylinder3.bState_AtWorkPos OR bSensorWork3HMI THEN
+					cylinder3.MoveToBase();
+					bCheck := FALSE;
+				END_IF
+			ELSE
+				iStepAuto	:= 99;
+			END_IF
+		END_IF
+		
+		IF NOT bCheck THEN
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 2;
+			END_IF
+		END_IF
+
+	11://run cylin 4
+		IF bCheck THEN
+			IF NOT cylinder4.bError THEN
+				cylinder4.MoveToWork();
+				IF cylinder4.bState_AtWorkPos OR bSensorWork4HMI THEN
+					cylinder4.MoveToBase();
+					bCheck := FALSE;
+				END_IF
+			ELSE
+				iStepAuto	:= 99;
+			END_IF
+		END_IF
+		
+		IF NOT bCheck THEN
+			trigStep(clk:=bRun);
+			IF NOT bRunStep OR trigStep.Q THEN
+				iStepAuto := iStepAuto + 1;
+			END_IF
+		END_IF
+
+	12:// counter
+		trigSensorOK(clk:=bSensorOK.Value OR bSensorOKHMI);
+		trigSensorNG(clk:=bSensorNG.Value OR bSensorNGHMI);
+		IF trigSensorOK.Q THEN
+			icounterOK := icounterOK + 1;
+		END_IF
+		IF trigSensorNG.Q THEN
+			icounterNG := icounterNG + 1;
+		END_IF
+		IF NOT bStopTem THEN
+			iStepAuto := 0;
+		END_IF
+	99://Error
+		iStepGeneral := 99;
+		
+		
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateError" Id="{7be87b9d-a30c-4109-8bd3-bcf9c1c1af7f}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateError : BOOL
+VAR
+	bfirstCycle	: bool := true;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bfirstCycle THEN
+	bfirstCycle:= FALSE;
+	IF servo.AnyError THEN
+		servoAlarm.Set(bIn := TRUE);
+		servoAlarm.Description := 'Servo bi loi';
+	END_IF
+	IF fbTcpServer.Error THEN
+		tcpServerAlarm.Set(bIn := TRUE);
+		tcpServerAlarm.Description := 'TCP-IP Server bi loi';
+		END_IF
+	IF NOT fbTcpServer.IsConnect THEN
+		tcpServerAlarm.Set(bIn := TRUE);
+		tcpServerAlarm.Description := 'Khong co Client nao ket noi';
+	END_IF
+END_IF
+	
+
+trig1s(IN := TRUE);
+IF trig1s.Q THEN
+	trig1s(IN := TRUE);
+	bLightRed.OutAuto := NOT bLightRed.OutAuto;
+END_IF
+
+IF bReset.Value THEN
+	iStepGeneral := 0;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateInit" Id="{96181f7b-dce7-4415-bffc-8dd08a74eea1}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateInit : BOOL
+VAR
+	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//init cylin
+cylinder1.MoveToBase();
+cylinder1.Reset();
+cylinder2.MoveToBase();
+cylinder2.Reset();
+cylinder3.MoveToBase();
+cylinder3.Reset();
+cylinder4.MoveToBase();
+cylinder4.Reset();
+//init servo
+servo.Reset();
+servo.Override := 100;
+servo.Init();
+servo.MoveAbsolute(Position:=0);
+//Init tcp-ip
+IF NOT fbTcpServer.IsConnect THEN
+	IF bFirstCycle THEN
+		bFirstCycle := FALSE;
+		fbTcpServer.Disconnect();
+		fbTcpServer.LocalHost	:= sLocalHost;
+		fbTcpServer.LocalPort	:= nLocalPort;
+		fbTcpServer.NetId		:= sNetId;
+		fbTcpServer.Connect();
+	END_IF
+END_IF
+
+bLightGreen.OutAuto 	:= FALSE;
+bLightYellow.OutAuto 	:= FALSE;
+blightRed.OutAuto 		:= FALSE;
+
+bCheck					:= FALSE;
+iStepAuto				:= 0;
+IF servo.ActualPosition = 0 THEN
+	iStepGeneral			:= iStepGeneral + 1;
+END_IF
+
+
+
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateMachine" Id="{ac994074-fb32-4498-adda-bf74bc706703}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD private StateMachine : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE iStepGeneral OF
+	0: 
+		StateInit();
+	1:
+		StateUninitialized();
+	2:
+		StateReady();
+	10:
+		StateRun();
+	20:
+		StateRunDone();
+	30:
+		StateStop();
+	40:
+		StateStopDone();
+	99:
+		StateError();
+	
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateManual" Id="{f31840a1-06ec-4acc-b4e4-9f4262822cbd}" FolderPath="System\">
+      <Declaration><![CDATA[METHOD PRIVATE StateManual : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//cylinder
+IF bMoveWorkCylinder1 THEN
+	cylinder1.MoveToWork();
+	bMoveWorkCylinder1 := FALSE;
+END_IF
+IF bMoveBaseCylinder1 THEN
+	cylinder1.MoveToBase();
+	bMoveBaseCylinder1 := FALSE;
+END_IF
+IF bMoveWorkCylinder2 THEN
+	cylinder2.MoveToWork();
+	bMoveWorkCylinder2 := FALSE;
+END_IF
+IF bMoveBaseCylinder2 THEN
+	cylinder2.MoveToBase();
+	bMoveBaseCylinder2 := FALSE;
+END_IF
+IF bMoveWorkCylinder3 THEN
+	cylinder3.MoveToWork();
+	bMoveWorkCylinder3 := FALSE;
+END_IF
+IF bMoveBaseCylinder3 THEN
+	cylinder3.MoveToBase();
+	bMoveBaseCylinder3 := FALSE;
+END_IF
+IF bMoveWorkCylinder4 THEN
+	cylinder4.MoveToWork();
+	bMoveWorkCylinder4 := FALSE;
+END_IF
+IF bMoveBaseCylinder4 THEN
+	cylinder4.MoveToBase();
+	bMoveBaseCylinder4 := FALSE;
+END_IF
+//servo
+IF bMoveServo THEN
+	servo.Jog(Distance:=rDistance);
+	bMoveServo := FALSE;
+END_IF
+IF bStopServo THEN
+	bStopServo := FALSE;
+	servo.Stop();
+END_IF
+//TCP-Ip
+IF bConnect THEN
+	fbTcpServer.Connect();
+	bConnect := FALSE;
+END_IF
+IF bDisconnect THEN
+	fbTcpServer.Disconnect();
+	bDisconnect := FALSE;
+END_IF
+IF bSend THEN
+	fbTcpServer.SendData(DataSend := sDataSend);
+	bSend := FALSE;
+END_IF
+//system
+bLightGreen.OutAuto		:= bOnLightGreen	;
+bLightYellow.OutAuto    := bOnLightYellow	;
+bLightRed.OutAuto       := bOnLightRed		;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateReady" Id="{b5b15211-e18a-47f8-ab1d-a3f2fce1cf3b}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateReady : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[trig500ms(in := TRUE);
+IF bIsReady AND trig500ms.Q THEN
+	trig500ms(in := FALSE);
+	bLightGreen.OutAuto := NOT bLightGreen.OutAuto;
+END_IF
+
+IF bStart.Value OR bStartHMI THEN
+	iStepGeneral := 10;
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateRun" Id="{4961c867-2e17-4743-b060-3b3af6773116}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateRun : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE iStepRun OF
+	10:
+		StateAuto();
+		bLightGreen.OutAuto := TRUE;
+	20:
+		StateManual();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateRunDone" Id="{b3e491d1-4093-4d94-bca9-4576ffa12aae}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateRunDone : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateStop" Id="{df2768bb-02bf-4caf-bfdb-40b23cb71d28}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateStop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateStopDone" Id="{e7639574-c565-45bd-9b78-8f7c58f85013}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateStopDone : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateUninitialized" Id="{3199c002-e9f2-43fb-b160-a019466ba7a6}" FolderPath="StateMachine\">
+      <Declaration><![CDATA[METHOD PRIVATE StateUninitialized : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[bISError := servo.AnyError OR fbTcpServer.Error OR fbTcpServer.Error ;
+//bIsReady := cylinder1.bState_AtBasePos AND cylinder2.bState_AtBasePos AND cylinder3.bState_AtBasePos AND cylinder4.bState_AtBasePos AND fbTcpServer.IsConnect AND servo.Enabled;
+bIsReady := TRUE;
+		
+IF bIsError THEN
+	iStepGeneral := 99;
+END_IF
+
+IF NOT bIsReady THEN
+	bLightYellow.OutAuto := TRUE;
+END_IF
+
+IF bIsReady THEN
+	iStepGeneral := 2;
+END_IF
+IF NOT bIsReady THEN
+	IF bReset.Value OR bResetHMI THEN
+		iStepGeneral := 0;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Machine">
+      <LineId Id="3" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="173" Count="0" />
+      <LineId Id="4" Count="7" />
+      <LineId Id="195" Count="3" />
+      <LineId Id="12" Count="7" />
+      <LineId Id="181" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Machine.AssignHMI">
+      <LineId Id="8" Count="9" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="91" Count="6" />
+      <LineId Id="18" Count="21" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="40" Count="5" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="46" Count="2" />
+      <LineId Id="51" Count="3" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="55" Count="3" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="99" Count="2" />
+      <LineId Id="65" Count="2" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="68" Count="2" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="83" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateAuto">
+      <LineId Id="3" Count="2" />
+      <LineId Id="254" Count="2" />
+      <LineId Id="252" Count="1" />
+      <LineId Id="6" Count="6" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="192" Count="2" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="189" Count="0" />
+      <LineId Id="16" Count="2" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="257" Count="1" />
+      <LineId Id="260" Count="0" />
+      <LineId Id="263" Count="8" />
+      <LineId Id="261" Count="1" />
+      <LineId Id="27" Count="6" />
+      <LineId Id="195" Count="0" />
+      <LineId Id="34" Count="3" />
+      <LineId Id="39" Count="3" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="204" Count="2" />
+      <LineId Id="203" Count="0" />
+      <LineId Id="201" Count="0" />
+      <LineId Id="207" Count="0" />
+      <LineId Id="48" Count="13" />
+      <LineId Id="210" Count="2" />
+      <LineId Id="208" Count="1" />
+      <LineId Id="65" Count="4" />
+      <LineId Id="71" Count="3" />
+      <LineId Id="213" Count="0" />
+      <LineId Id="215" Count="5" />
+      <LineId Id="79" Count="10" />
+      <LineId Id="221" Count="4" />
+      <LineId Id="93" Count="12" />
+      <LineId Id="226" Count="0" />
+      <LineId Id="106" Count="3" />
+      <LineId Id="111" Count="3" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="228" Count="5" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="119" Count="4" />
+      <LineId Id="125" Count="3" />
+      <LineId Id="235" Count="5" />
+      <LineId Id="133" Count="12" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="241" Count="4" />
+      <LineId Id="146" Count="0" />
+      <LineId Id="150" Count="13" />
+      <LineId Id="247" Count="4" />
+      <LineId Id="167" Count="17" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateError">
+      <LineId Id="14" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="25" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateInit">
+      <LineId Id="3" Count="10" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="55" Count="3" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="46" Count="2" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="23" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateMachine">
+      <LineId Id="3" Count="8" />
+      <LineId Id="14" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateManual">
+      <LineId Id="3" Count="37" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="54" Count="2" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateReady">
+      <LineId Id="11" Count="3" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateRun">
+      <LineId Id="3" Count="2" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="6" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateRunDone">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateStop">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateStopDone">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.StateUninitialized">
+      <LineId Id="26" Count="0" />
+      <LineId Id="3" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="27" Count="3" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="1" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="16" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

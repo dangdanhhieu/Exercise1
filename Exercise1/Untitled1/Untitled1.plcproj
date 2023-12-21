@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <FileVersion>1.0.0.0</FileVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5ed31d8a-9a64-4f68-a3c8-bb915e52d3a9}</ProjectGuid>
+    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <DownloadApplicationInfo>true</DownloadApplicationInfo>
+    <WriteProductVersion>true</WriteProductVersion>
+    <GenerateTpy>false</GenerateTpy>
+    <Name>Untitled1</Name>
+    <ProgramVersion>3.1.4024.0</ProgramVersion>
+    <Application>{e193ba5e-4d6f-4790-900e-39d7ee26a8bf}</Application>
+    <TypeSystem>{7f402f6f-7bcf-44e5-bf65-d4dee3f492e6}</TypeSystem>
+    <Implicit_Task_Info>{54ee6357-416b-4a10-a2dc-b79e15bdf86c}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{40f8f09f-6138-41eb-8d86-6369ad4e108e}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{60698a3b-5d73-4d44-9964-ae3a44cf49b4}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{096e3e6d-1d3c-4056-8705-30c5b33f08a2}</LibraryReferences>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="GVLs\GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="GVLs\GVL_HMI.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="PlcTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Alarm\FB_Alarm.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Main\FB_Machine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Main\MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Cylinder\FB_Cylinder.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Cylinder\FB_CylinderDiag.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Cylinder\FB_CylinderTemp.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Cylinder\FB_CylinderTempDiag.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Cylinder\FB_CylinderTempRecord.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\TCP IP\FB_TCPServer.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal Digital Input\FB_Input.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal Digital Input\I_Input.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal Digital Output\FB_Output.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal Digital Output\I_Output.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal motor\FB_Axis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal motor\FB_Axis_Multi_Master.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal motor\FB_HomeableAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal motor\FB_HomeableEncAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\UniversalBlocks\Universal motor\I_UniversalMotor.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DUTs" />
+    <Folder Include="GVLs" />
+    <Folder Include="POUs\Main" />
+    <Folder Include="POUs\Alarm" />
+    <Folder Include="POUs\UniversalBlocks" />
+    <Folder Include="POUs\UniversalBlocks\Cylinder" />
+    <Folder Include="POUs\UniversalBlocks\TCP IP" />
+    <Folder Include="POUs\UniversalBlocks\Universal Digital Input" />
+    <Folder Include="POUs\UniversalBlocks\Universal Digital Output" />
+    <Folder Include="POUs\UniversalBlocks\Universal motor" />
+    <Folder Include="VISUs" />
+    <Folder Include="POUs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderReference Include="Tc2_MC2">
+      <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Standard">
+      <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Standard</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_System">
+      <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_System</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_TcpIp">
+      <DefaultResolution>Tc2_TcpIp, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_TcpIp</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Utilities">
+      <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Module">
+      <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Module</Namespace>
+    </PlaceholderReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SubObject Include="FB_Alarm.AlarmNumber" />
+    <SubObject Include="FB_Alarm.AlarmNumber.Get" />
+    <SubObject Include="FB_Alarm.AlarmNumber.Set" />
+    <SubObject Include="FB_Alarm.Description" />
+    <SubObject Include="FB_Alarm.Description.Get" />
+    <SubObject Include="FB_Alarm.Description.Set" />
+    <SubObject Include="FB_Alarm.Get" />
+    <SubObject Include="FB_Alarm.Reset" />
+    <SubObject Include="FB_Alarm.Set" />
+    <SubObject Include="FB_Alarm.TimeOfOccur" />
+    <SubObject Include="FB_Alarm.TimeOfOccur.Get" />
+    <SubObject Include="FB_Input.Description" />
+    <SubObject Include="FB_Input.Description.Get" />
+    <SubObject Include="FB_Input.Description.Set" />
+    <SubObject Include="FB_Input.Value" />
+    <SubObject Include="FB_Input.Value.Get" />
+    <SubObject Include="FB_Output.Description" />
+    <SubObject Include="FB_Output.Description.Get" />
+    <SubObject Include="FB_Output.Description.Set" />
+    <SubObject Include="FB_Output.ManualMode" />
+    <SubObject Include="FB_Output.ManualMode.Get" />
+    <SubObject Include="FB_Output.ManualMode.Set" />
+    <SubObject Include="FB_Output.OutAuto" />
+    <SubObject Include="FB_Output.OutAuto.Get" />
+    <SubObject Include="FB_Output.OutAuto.Set" />
+    <SubObject Include="FB_Output.OutManual" />
+    <SubObject Include="FB_Output.OutManual.Get" />
+    <SubObject Include="FB_Output.OutManual.Set" />
+    <SubObject Include="I_Input.Description" />
+    <SubObject Include="I_Input.Description.Get" />
+    <SubObject Include="I_Input.Description.Set" />
+    <SubObject Include="I_Input.Value" />
+    <SubObject Include="I_Input.Value.Get" />
+    <SubObject Include="I_Output.Description" />
+    <SubObject Include="I_Output.Description.Get" />
+    <SubObject Include="I_Output.Description.Set" />
+    <SubObject Include="I_Output.ManualMode" />
+    <SubObject Include="I_Output.ManualMode.Get" />
+    <SubObject Include="I_Output.ManualMode.Set" />
+    <SubObject Include="I_Output.OutAuto" />
+    <SubObject Include="I_Output.OutAuto.Get" />
+    <SubObject Include="I_Output.OutAuto.Set" />
+    <SubObject Include="I_Output.OutManual" />
+    <SubObject Include="I_Output.OutManual.Get" />
+    <SubObject Include="I_Output.OutManual.Set" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Untitled1.tmc">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ProjectExtensions>
+    <PlcProjectOptions>
+      <XmlArchive>
+  <Data>
+    <o xml:space="preserve" t="OptionKey">
+      <v n="Name">"&lt;ProjectRoot&gt;"</v>
+      <d n="SubKeys" t="Hashtable" />
+      <d n="Values" t="Hashtable" />
+    </o>
+  </Data>
+  <TypeList>
+    <Type n="Hashtable">System.Collections.Hashtable</Type>
+    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive>
+    </PlcProjectOptions>
+  </ProjectExtensions>
+</Project>

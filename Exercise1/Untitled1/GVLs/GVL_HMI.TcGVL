@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="GVL_HMI" Id="{1f0648b6-2839-4810-b45a-6b196e7e4a5b}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+//Cylinder
+//Input
+	bMoveWorkCylinder1	: BOOL;
+	bMoveBaseCylinder1	: BOOL;
+	bMoveWorkCylinder2	: BOOL;
+	bMoveBaseCylinder2	: BOOL;
+	bMoveWorkCylinder3	: BOOL;
+	bMoveBaseCylinder3	: BOOL;
+	bMoveWorkCylinder4	: BOOL;
+	bMoveBaseCylinder4	: BOOL;
+//Cylinder
+//Output
+	bAtBasePosCylinder1	: BOOL;
+	bAtWorkPosCylinder1	: BOOL;
+	bAtBasePosCylinder2	: BOOL;
+	bAtWorkPosCylinder2	: BOOL;
+	bAtBasePosCylinder3	: BOOL;
+	bAtWorkPosCylinder3	: BOOL;
+	bAtBasePosCylinder4	: BOOL;
+	bAtWorkPosCylinder4	: BOOL;
+
+//Servo
+//Input
+	bMoveServo			: BOOL;
+	rDistance			: LREAL;
+	bStopServo			: BOOL;
+	
+//Servo
+//Output
+	rPosition			: LREAL;
+	rVelocity			: LREAL;
+	rEnable				: BOOL;
+	bErrorServo			: BOOL;
+//Tcp-ip server
+//Input
+	bConnect			: BOOL;
+	bDisconnect			: BOOL;
+	bSend				: BOOL;
+	sDataSend			: STRING(255);
+//Tcp-ip server
+//Output
+	bIsConnect			: BOOL;
+	sLocalHost			: T_IPv4Addr;
+	sLocalPort			: UDINT;
+	sDataRev			: STRING(255);
+	bErrorTcp			: BOOL;
+//System
+//Input
+	bManual				: BOOL;
+	bAuto				: BOOL;
+	bStart				: BOOL;
+	bReset				: BOOL;
+	bStopSystem			: BOOL;
+	bEStopSystem		: BOOL;
+	
+	bSensorCheck		: BOOL;
+	bSensorOK			: BOOL;
+	bSensorNG			: BOOL;
+	
+	bSensorBase1HMI		: BOOL;
+	bSensorWork1HMI     : bool;
+	bSensorBase2HMI     : bool;
+	bSensorWork2HMI     : bool;
+	bSensorBase3HMI     : bool;
+	bSensorWork3HMI     : bool;
+	bSensorBase4HMI     : bool;
+	bSensorWork4HMI     : bool;
+	
+	bRunStep			: BOOL;
+	bRun				: BOOL;
+	
+	bOnLightGreen		: BOOL;
+	bOnLightYellow		: BOOL;
+	bOnLightRed			: BOOL;
+		
+//System
+//Output
+	bIsReady			: BOOL;
+	bLightGreen			: BOOL;
+    bLightYellow	    : bool;
+    bLightRed		    : bool;
+                       
+	iCounterOK			: INT;
+	iCounterNG			: INT;
+	bErrorSystem		: BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

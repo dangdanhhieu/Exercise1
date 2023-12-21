@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Input" Id="{223e9000-979a-4a8f-8fcf-710a846d6047}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Input IMPLEMENTS I_Input
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	sDescription			:	STRING; //Description of the physical input
+	bIn				AT %I*	:	BOOL;	// Physical input
+	bRisingTrigger			:	BOOL;
+	bFallingTrigger			:	BOOL;
+	rtIn					:	R_TRIG; //Rising edge of the input
+	ftIn					:	F_TRIG; //Falling edge of the input	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Description" Id="{057ffb6c-b47d-4542-ada6-dd39a07962e6}">
+      <Declaration><![CDATA[PROPERTY Description : STRING
+]]></Declaration>
+      <Get Name="Get" Id="{664afd07-53a4-4737-b46e-9eee8e2442b4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Description := sDescription;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{35cb0eae-5527-43e8-b4fc-212a882f116c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[sDescription := Description;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Value" Id="{a95c409d-bb64-41c3-acde-78b674b539d7}">
+      <Declaration><![CDATA[PROPERTY Value : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{96c92c67-f86b-4d16-a169-fc13b9bd4a26}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Value := bIn;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_Input">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Input.Description.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Input.Description.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Input.Value.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

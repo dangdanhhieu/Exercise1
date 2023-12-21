@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Itf Name="I_UniversalMotor" Id="{95ea5372-be3d-45e1-9d49-97657d69cbe0}">
+    <Declaration><![CDATA[INTERFACE I_UniversalMotor
+]]></Declaration>
+    <Method Name="Abort" Id="{41ef6a92-9d3e-44b0-ac70-e72ab78cbf8c}">
+      <Declaration><![CDATA[METHOD Abort : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="ActualPosition" Id="{bdcc4591-5f17-41e2-afcb-d062baca1b15}">
+      <Declaration><![CDATA[PROPERTY ActualPosition : LREAL]]></Declaration>
+      <Get Name="Get" Id="{042ae297-1ed6-41ce-b1c7-60b45c5a1b9c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="AxisReference" Id="{9f5d9b85-41e4-4674-89f4-8c092f3d48ec}">
+      <Declaration><![CDATA[PROPERTY AxisReference : AXIS_REF]]></Declaration>
+      <Get Name="Get" Id="{ca5aaa11-ee4b-45d1-8d24-e6b2262f8cbc}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Couple" Id="{33ff9662-8bdf-4838-a0fb-391f702fd051}">
+      <Declaration><![CDATA[METHOD Couple : BOOL
+VAR_INPUT
+
+END_VAR
+
+VAR
+
+END_VAR]]></Declaration>
+    </Method>
+    <Property Name="Coupleable" Id="{f4a27231-e466-4cc2-be4e-b981a7c7d6a6}">
+      <Declaration><![CDATA[PROPERTY Coupleable : BOOL]]></Declaration>
+      <Get Name="Get" Id="{931fa3ba-8bac-4ba3-9ac7-61833283be2f}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{ac28e13a-d0a4-4ebd-9b00-71b6aa5ebcbd}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="Coupled" Id="{d7cc03fc-5a61-48d0-904a-967828847224}">
+      <Declaration><![CDATA[PROPERTY Coupled : BOOL]]></Declaration>
+      <Get Name="Get" Id="{c5089489-827c-4844-b0ef-a5cdc4868251}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Decouple" Id="{6df1250b-4080-44e8-ab6b-63e423e87208}">
+      <Declaration><![CDATA[METHOD Decouple : BOOL
+VAR_INPUT
+END_VAR
+VAR
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="Home" Id="{a958eb08-04f8-4467-ad60-342dbeb4cb8a}">
+      <Declaration><![CDATA[METHOD Home : BOOL // Start axis homing
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="Homed" Id="{3f29323e-79f2-445c-b593-2ecda2f6bf32}">
+      <Declaration><![CDATA[PROPERTY Homed : BOOL]]></Declaration>
+      <Get Name="Get" Id="{1cae9f13-6b6a-4fed-9cb9-8e7ff2b308c3}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="Homingable" Id="{31bdf3d2-4dcc-4dfd-929d-caab6e58e871}">
+      <Declaration><![CDATA[PROPERTY Homingable : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b52effb0-cc7e-4a53-9d17-5050e2b3e5b5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{4f92f0f5-a196-4d0b-89e6-49c7109e2d12}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Method Name="Init" Id="{0b8cd39f-02f7-476d-9199-5d7119c1c212}">
+      <Declaration><![CDATA[METHOD Init : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="Initialized" Id="{eb994419-eac6-4b52-8ef4-41f3857e16cf}">
+      <Declaration><![CDATA[PROPERTY Initialized : BOOL]]></Declaration>
+      <Get Name="Get" Id="{5e49cecf-31fb-4190-9689-3950da99505c}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Jog" Id="{95b8d47c-45bc-4fc1-80ea-5784b7382dc0}">
+      <Declaration><![CDATA[METHOD Jog : BOOL
+VAR_INPUT
+	Distance	:	LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="MotorName" Id="{2e4bf95e-5be0-4191-9fe4-869e161b9c62}">
+      <Declaration><![CDATA[PROPERTY MotorName : STRING]]></Declaration>
+      <Get Name="Get" Id="{c1e2e84f-3a2a-4510-a06a-d7cc60afdbb0}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{1fb93800-79e6-48cb-8f9b-a5b47db29813}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Method Name="MoveAbsolute" Id="{e089bf2c-4a92-4acb-8a76-61430383c3f3}">
+      <Declaration><![CDATA[METHOD MoveAbsolute : BOOL // Do action 2 request, for instance: 'Pick and place unit' change tool (additional inputs needed)
+VAR_INPUT
+	Position : LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Reset" Id="{68abb08b-f886-4a29-8cc3-a9583cd195a7}">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="Unit" Id="{06983b9e-8e66-4409-9f5a-827371225648}">
+      <Declaration><![CDATA[PROPERTY Unit : STRING]]></Declaration>
+      <Get Name="Get" Id="{d7b49bac-d72a-4073-8273-d38c230dcc33}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{740f0242-9622-4ced-8c6b-95645d2cfb9f}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+  </Itf>
+</TcPlcObject>

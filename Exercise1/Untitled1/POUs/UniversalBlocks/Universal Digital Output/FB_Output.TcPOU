@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Output" Id="{5cc7aa47-0b26-4ec9-a125-9e3eeb4b5f3f}" SpecialFunc="None">
+    <Declaration><![CDATA[// Function block used for physical output control
+FUNCTION_BLOCK FB_Output IMPLEMENTS I_Output
+VAR_INPUT
+
+END_VAR
+VAR_OUTPUT
+
+END_VAR
+VAR
+	bOut	AT %Q*	:	BOOL;	// Physical output
+	sDescription	:	STRING;	// Description of the output
+	bOutAuto		:	BOOL;	// This value will be used in automatic mode
+	bManualMode		:	BOOL;	// Turns on and off manual mode
+	bOutManual		:	BOOL;	// This value will be used in manual mode
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Description" Id="{90955d4d-0c81-49ef-87f5-27aae1123746}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY Description : STRING]]></Declaration>
+      <Get Name="Get" Id="{255e2ff7-f769-4b1e-a72c-be7053c3b03f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Description := sDescription;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{135f6c88-e1fc-4837-acc7-af66d6b4b92c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[sDescription := Description;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ManualMode" Id="{7786d54d-55ec-4d6c-8e82-a6dc55804da9}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY ManualMode : BOOL]]></Declaration>
+      <Get Name="Get" Id="{476b28a4-3c83-4afb-946a-fc076eeb90fd}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ManualMode := bManualMode;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{919cd098-c48a-46ea-9ef2-6a845ac35a19}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bManualMode := ManualMode;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="OutAuto" Id="{982a39c5-a113-4ab1-874f-5eee41d6a309}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY OutAuto : BOOL]]></Declaration>
+      <Get Name="Get" Id="{c6945c41-bd22-4b4e-96fb-077a6d8f8e57}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[OutAuto := bOut;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e761d01d-b198-498b-a072-a04074410495}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bOutAuto := OutAuto;
+IF NOT bManualMode THEN
+	bOut := bOutAuto;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="OutManual" Id="{9e156cd2-fbe0-4f81-a7bc-ea8f8c990eb9}">
+      <Declaration><![CDATA[{attribute 'monitoring' := 'variable'}
+PROPERTY OutManual : BOOL]]></Declaration>
+      <Get Name="Get" Id="{873ae1ac-e1f3-4f11-b18c-a54d3bc1f333}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[OutManual := bOut;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{044bd78b-aa8c-4c36-9f93-f0cf201a8b69}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[bOutManual := OutManual;
+IF bManualMode THEN
+	bOut := bOutManual;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_Output">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.Description.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.Description.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.ManualMode.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.ManualMode.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.OutAuto.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.OutAuto.Set">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.OutManual.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Output.OutManual.Set">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

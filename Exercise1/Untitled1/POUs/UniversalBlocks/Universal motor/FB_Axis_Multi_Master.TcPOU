@@ -1,0 +1,396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.9">
+  <POU Name="FB_Axis_Multi_Master" Id="{a7ee738b-fc97-4290-aac0-313fd8dd900d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Axis_Multi_Master EXTENDS FB_Axis
+VAR
+		// =============== Axis reference =========================
+	Master1AxisRef			: AXIS_REF;	
+	Master2AxisRef			: AXIS_REF;	
+	Master3AxisRef			: AXIS_REF;	
+	Master4AxisRef			: AXIS_REF;	
+	
+	// =============== Motion function blocks =================
+	fbGearInMultiMaster: MC_GearInMultiMaster; //FB to gear in multiple axes
+	fbGearOut: MC_GearOut; //FB to gear out multiple axes
+	
+	lrGearRatio1	:	LREAL;
+	lrGearRatio2	:	LREAL;
+	lrGearRatio3	:	LREAL;
+	lrGearRatio4	:	LREAL;
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[SUPER^();]]></ST>
+    </Implementation>
+    <Folder Name="Requests" Id="{87e106b2-4e12-470f-9ddc-360c918734a1}" />
+    <Folder Name="Statemachine" Id="{e453d705-bea6-4ef1-8c5a-1106f5fc246b}" />
+    <Method Name="Abort" Id="{9efb57c8-9497-4fd5-a998-5897e2f084bf}" FolderPath="Requests\">
+      <Declaration><![CDATA[METHOD Abort : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Abort();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Couple" Id="{a4c1f98d-b577-4b51-ba8d-57de2e8f4d33}" FolderPath="Requests\">
+      <Declaration><![CDATA[METHOD Couple : BOOL
+VAR_INPUT
+
+END_VAR
+
+VAR
+
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF iStepGeneral = 30 THEN
+	iStepGeneral := 1000;
+END_IF
+
+Couple := iStepGeneral = 1010;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Decouple" Id="{0fbc4e26-1215-4e56-870b-697732d91dd3}" FolderPath="Requests\">
+      <Declaration><![CDATA[METHOD Decouple : BOOL
+VAR_INPUT
+
+END_VAR
+
+VAR
+	bGearInMultimaster	:	BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF iStepGeneral = 1010 OR iStepGeneral = 1000 THEN
+	iStepGeneral := 1020;
+END_IF
+Decouple := iStepGeneral = 30;
+
+
+
+
+
+	]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="GearRatio1" Id="{2e47e827-3012-4abe-99ad-a58ca6b32f77}">
+      <Declaration><![CDATA[
+PROPERTY GearRatio1 : LREAL]]></Declaration>
+      <Get Name="Get" Id="{0e7f5254-1930-43c3-8072-869929a25ad8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GearRatio1 := lrGearRatio1;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f717f5d4-e84d-4557-8dae-901b66d47a23}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[lrGearRatio1 := GearRatio1;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="GearRatio2" Id="{5fadca3d-9e35-4dc2-bad9-59f55ca01a8f}">
+      <Declaration><![CDATA[
+PROPERTY GearRatio2 : LREAL]]></Declaration>
+      <Get Name="Get" Id="{360464fa-7702-4159-b9bf-d2f041f8f813}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GearRatio2 := lrGearRatio2;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{8960aa2d-4ae8-4d16-96e2-d9eaffc04187}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[lrGearRatio2 := GearRatio2;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="GearRatio3" Id="{88b7c957-c004-49a4-a4ed-bce0a3e69927}">
+      <Declaration><![CDATA[
+PROPERTY GearRatio3 : LREAL]]></Declaration>
+      <Get Name="Get" Id="{a361be15-d25e-44f2-af9b-a6ef2fd6a4b7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GearRatio3 := lrGearRatio3;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{cebb8b6d-d915-4176-aa79-7e972a37d9ea}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[lrGearRatio3 := GearRatio3;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="GearRatio4" Id="{57670999-8f84-4fc1-8f19-892684849b0e}">
+      <Declaration><![CDATA[
+PROPERTY GearRatio4 : LREAL]]></Declaration>
+      <Get Name="Get" Id="{a405e2e2-a9fe-4e45-82cd-2337892629b4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GearRatio4 := lrGearRatio4;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{875fe31b-a766-4d09-98c5-4c2c235f8ede}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[lrGearRatio4 := GearRatio4;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Reset" Id="{08ea8f45-631c-42ad-b5ac-724cb94f437f}" FolderPath="Requests\">
+      <Declaration><![CDATA[METHOD Reset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbGearInMultiMaster(	Slave 			:= AxisRef,
+						Enable 			:= FALSE,
+						Master1			:= Master1AxisRef,
+						Master2			:= Master2AxisRef,
+						Master3			:= Master3AxisRef,
+						Master4			:= Master4AxisRef,);
+fbGearOut(	Slave	:= AxisRef,
+			Execute	:= FALSE);
+						
+SUPER^.Reset();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateAborting" Id="{5ab8873f-56b2-473c-8b84-3e6f18c48456}" FolderPath="Statemachine\">
+      <Declaration><![CDATA[METHOD PROTECTED StateAborting : BOOL
+VAR_INPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE iStepAborting OF
+	0: 	fbMcHalt(	Execute	:= FALSE,
+					Axis 	:= AxisRef);
+		fbMcMoveVelocity(	Execute	:= FALSE,
+							Axis 	:= AxisRef);
+		fbMcMoveAbsolute(	Execute	:= FALSE,
+							Axis 	:= AxisRef);
+		fbMcMoveRelative(	Execute	:= FALSE,
+							Axis 	:= AxisRef);
+		fbMcReset(			Execute	:= FALSE,
+							Axis 	:= AxisRef);
+		fbGearInMultiMaster(	Enable			:= FALSE,
+								Master1			:= Master1AxisRef,
+								Master2			:= Master2AxisRef,
+								Master3			:= Master3AxisRef,
+								Master4			:= Master4AxisRef,
+								Slave			:= AxisRef);
+		fbGearOut (		Execute	:= FALSE,
+						Slave 	:= AxisRef);
+		fbMcStop(		Execute	:= FALSE,
+						Axis 	:= AxisRef);
+		iStepAborting := 10;
+	10: fbGearOut(	Execute := TRUE,
+					Slave := AxisRef);
+		IF fbGearOut.Done THEN
+			iStepAborting := 15;
+		ELSIF fbGearOut.Error THEN
+			bError := TRUE;
+			iErrorID := fbGearOut.ErrorID;
+			iStepAborting := 15;
+		END_IF
+	15: fbGearOut(	Execute := FALSE,
+					Slave := AxisRef);
+		iStepAborting := 20;
+		
+	20:	fbMcStop(	Execute	:= TRUE,
+					Axis 	:= AxisRef);
+		IF fbMcStop.Done THEN
+			iStepAborting := 30;
+		ELSIF fbMcStop.Error THEN
+			bError := fbMcStop.Error;
+			iErrorID := fbMcStop.ErrorID;
+			iStepAborting := 30;
+		END_IF
+	30:	fbMcStop(	Execute	:= FALSE,
+					Axis 	:= AxisRef);
+		iStepAborting := 0;
+		iStepGeneral := 0;
+							
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateCoupleDone" Id="{eefef067-d529-4fd9-84af-5ace6b711f5e}" FolderPath="Statemachine\">
+      <Declaration><![CDATA[METHOD PROTECTED StateCoupleDone : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbGearInMultiMaster(	Enable			:= TRUE,
+						Master1			:= Master1AxisRef,
+						GearRatio1		:= lrGearRatio1,
+						Master2			:= Master2AxisRef,
+						GearRatio2		:= lrGearRatio2,
+						Master3			:= Master3AxisRef,
+						GearRatio3		:= lrGearRatio3,
+						Master4			:= Master4AxisRef,
+						GearRatio4		:= lrGearRatio4,
+						Slave			:= AxisRef,
+						Acceleration	:= lrAccelerationAuto);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateCoupling" Id="{81855842-c1d1-4ea6-86c0-a7d19591ee31}" FolderPath="Statemachine\">
+      <Declaration><![CDATA[METHOD PROTECTED StateCoupling : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbGearInMultiMaster(	Enable			:= TRUE,
+						Master1			:= Master1AxisRef,
+						GearRatio1		:= lrGearRatio1,
+						Master2			:= Master2AxisRef,
+						GearRatio2		:= lrGearRatio2,
+						Master3			:= Master3AxisRef,
+						GearRatio3		:= lrGearRatio3,
+						Master4			:= Master4AxisRef,
+						GearRatio4		:= lrGearRatio4,
+						Slave			:= AxisRef,
+						Acceleration	:= lrAccelerationAuto);
+IF fbGearInMultiMaster.InGear THEN
+	iStepGeneral := 1010;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateDecoupling" Id="{1dc43c9a-b445-4cb0-ae27-d94b00d98536}" FolderPath="Statemachine\">
+      <Declaration><![CDATA[METHOD PROTECTED StateDecoupling : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbGearInMultiMaster(	Enable			:= FALSE,
+						Master1			:= Master1AxisRef,
+						GearRatio1		:= lrGearRatio1,
+						Master2			:= Master2AxisRef,
+						GearRatio2		:= lrGearRatio2,
+						Master3			:= Master3AxisRef,
+						GearRatio3		:= lrGearRatio3,
+						Master4			:= Master4AxisRef,
+						GearRatio4		:= lrGearRatio4,
+						Slave			:= AxisRef,
+						Acceleration	:= lrAccelerationAuto);
+fbGearOut(	Slave := AxisRef,
+			Execute := TRUE);
+			
+IF fbGearOut.Done THEN
+	fbGearOut(	Slave := AxisRef,
+				Execute := FALSE);
+	iStepGeneral := 30;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StateMachine" Id="{048914e6-7a72-4a07-8b72-e94a8469aa7a}" FolderPath="Statemachine\">
+      <Declaration><![CDATA[METHOD PROTECTED StateMachine : BOOL // Sate machien of unit
+VAR_INPUT
+END_VAR
+
+VAR
+	StateAction6Done: INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//State machine	
+SUPER^.StateMachine();					   
+	CASE iStepGeneral OF
+		1000:  // Gearing in MM
+			Enable(TRUE);
+			StateCoupling();
+	
+		1010: // Gearing in MM done 
+			Enable(TRUE);
+			StateCoupleDone();
+	
+		1020: // Gearing out MM
+			Enable(TRUE);
+			StateDecoupling();
+	END_CASE
+	
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Axis_Multi_Master">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.Abort">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.Couple">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.Decouple">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio1.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio1.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio2.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio2.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio3.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio3.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio4.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.GearRatio4.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.Reset">
+      <LineId Id="3" Count="9" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.StateAborting">
+      <LineId Id="3" Count="48" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.StateCoupleDone">
+      <LineId Id="3" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.StateCoupling">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.StateDecoupling">
+      <LineId Id="3" Count="17" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Axis_Multi_Master.StateMachine">
+      <LineId Id="3" Count="15" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
