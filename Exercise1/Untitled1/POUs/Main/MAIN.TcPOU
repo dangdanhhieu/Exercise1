@@ -5,12 +5,16 @@
 VAR
 	fbMachine	: FB_Machine;
 	bTimeValid	: BOOL;
-
+	bTest		: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[fbMachine();
 CurrentTime();
+
+
+//TEst//
+
 ]]></ST>
     </Implementation>
     <Method Name="CurrentTime" Id="{2bfafcd3-c480-40dd-83bd-82b250af4621}">
@@ -37,7 +41,10 @@ END_IF]]></ST>
     </Method>
     <LineIds Name="MAIN">
       <LineId Id="3" Count="1" />
+      <LineId Id="11" Count="1" />
       <LineId Id="2" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="MAIN.CurrentTime">
       <LineId Id="3" Count="12" />
