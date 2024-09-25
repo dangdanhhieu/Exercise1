@@ -6,6 +6,7 @@ VAR
 	fbMachine	: FB_Machine;
 	bTimeValid	: BOOL;
 	bTest		: BOOL;
+	bTest2		: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
